@@ -1,3 +1,5 @@
+from datetime import datetime
+
 basic_vaults = {}
 premium_vault = {}
 class SecretVault:
@@ -23,25 +25,38 @@ class PremiumVault(SecretVault):
         super().__init__(user, password)
         self.color = color
         self.balance = 0
+        self.history = []
     
     def add_deposit(self, amount):
         if amount <= 0:
             raise ValueError("invalid input, you cannot input a negative number") 
         self.balance += amount
+        new_record = Transaction("Deposit", amount)
+        self.history.append(new_record)
 
     def withdraw(self, amount):
         if amount > self.balance:
             return False
         else:
             self.balance = self.balance - amount
+            new_record = Transaction("Withdrawal", amount)
+            self.history.append(new_record)
             return True
+class Transaction:
+    def __init__(self, category, amount):
+        self.category = category
+        self.amount = amount
+        self.time = datetime.now().strftime("%H:%M:%S")
 
+    def display(self):
+        print(f"[{self.time}] {self.category}: ${self.amount}")
 
 print("T Vault")
 print("To open a vault account enter '1'")
 print("To access belongings in vault enter '2'")
 print("To withdraw enter '3'")
-print("To close Vault enter '4'")
+print("To check transaction history enter '4'")
+print("To close Vault enter '5'")
 
 
 first = 0
@@ -147,7 +162,15 @@ while True:
             else:
                 print("open a premium account to deposit and withdraw")
                 continue
-        elif user_input == 4:
+        elif user_input == 4: 
+            target = input("Vault Name: ")
+            if target in premium_vault:
+                vault = premium_vault[target]
+        
+                print(f"--- Transaction History for {target} ---")
+                for record in vault.history:
+                    record.display()
+        elif user_input == 5:
             print("Vault closed")
             break
 
